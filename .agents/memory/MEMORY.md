@@ -1,0 +1,2 @@
+- [Taranom Mehr architecture](taranom-arch.md) — Persian RTL Konkur platform: state-driven views, cookie sessions, AI abstraction with offline fallbacks.
+- [Frontend layout pattern](frontend-arch.md) — top-header layout (not sidebar); framer-motion (NOT motion/react); Student type in types.ts; toStudent() adapter in App.tsx bridges flat API response to nested academicProfile expected by views.

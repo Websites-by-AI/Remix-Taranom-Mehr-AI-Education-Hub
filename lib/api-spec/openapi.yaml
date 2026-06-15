@@ -1,0 +1,902 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Taranom Mehr AI Education Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: students
+    description: Student management
+  - name: exams
+    description: Exam records
+  - name: traps
+    description: Test trap bank
+  - name: ai
+    description: AI powered features
+  - name: admin
+    description: Admin panel
+  - name: dashboard
+    description: Dashboard data
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with student code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout current session
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current logged-in student
+      responses:
+        "200":
+          description: Current student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "401":
+          description: Not authenticated
+
+  /students:
+    get:
+      operationId: listStudents
+      tags: [students]
+      summary: List all students (admin)
+      responses:
+        "200":
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+    post:
+      operationId: createStudent
+      tags: [students]
+      summary: Create a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+
+  /students/{id}:
+    get:
+      operationId: getStudent
+      tags: [students]
+      summary: Get student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateStudent
+      tags: [students]
+      summary: Update student profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+
+  /students/{id}/exams:
+    get:
+      operationId: listExams
+      tags: [exams]
+      summary: List exams for a student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of exams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exam"
+    post:
+      operationId: createExam
+      tags: [exams]
+      summary: Add an exam result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exam"
+
+  /students/{id}/traps:
+    get:
+      operationId: listTraps
+      tags: [traps]
+      summary: Get test traps for a student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of traps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TestTrap"
+    post:
+      operationId: createTrap
+      tags: [traps]
+      summary: Add a test trap
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrapInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestTrap"
+
+  /students/{id}/traps/{trapId}:
+    delete:
+      operationId: deleteTrap
+      tags: [traps]
+      summary: Delete a test trap
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: trapId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      parameters:
+        - name: studentId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /ai/motivational:
+    get:
+      operationId: getMotivational
+      tags: [ai]
+      summary: Get motivational quote
+      responses:
+        "200":
+          description: Quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MotivationalQuote"
+
+  /ai/chat:
+    post:
+      operationId: sendChat
+      tags: [ai]
+      summary: Send chat message to AI counselor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatInput"
+      responses:
+        "200":
+          description: AI reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatReply"
+
+  /ai/analyze-exam:
+    post:
+      operationId: analyzeExam
+      tags: [ai]
+      summary: AI-powered exam analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamAnalysisInput"
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExamAnalysisResult"
+
+  /ai/goal-insight:
+    post:
+      operationId: getGoalInsight
+      tags: [ai]
+      summary: AI goal likelihood and recommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoalInsightInput"
+      responses:
+        "200":
+          description: Goal insight
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalInsight"
+
+  /admin/status:
+    get:
+      operationId: getAdminStatus
+      tags: [admin]
+      summary: Get AI provider status
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStatus"
+
+  /admin/secrets:
+    get:
+      operationId: getAdminSecrets
+      tags: [admin]
+      summary: View masked API keys
+      responses:
+        "200":
+          description: Keys
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSecrets"
+
+  /admin/activate-provider:
+    post:
+      operationId: activateProvider
+      tags: [admin]
+      summary: Activate an AI provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProviderInput"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProviderResult"
+
+  /admin/test-ai:
+    post:
+      operationId: testAiProvider
+      tags: [admin]
+      summary: Test an AI provider connection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiTestInput"
+      responses:
+        "200":
+          description: Test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiTestResult"
+
+  /admin/config-status:
+    get:
+      operationId: getConfigStatus
+      tags: [admin]
+      summary: Get config and Cloudflare DNS status
+      responses:
+        "200":
+          description: Config status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigStatus"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    LoginInput:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+        role:
+          type: string
+
+    AuthResult:
+      type: object
+      required: [success, student, role]
+      properties:
+        success:
+          type: boolean
+        student:
+          $ref: "#/components/schemas/Student"
+        role:
+          type: string
+
+    Student:
+      type: object
+      required: [id, name, code, field, grade]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        field:
+          type: string
+        grade:
+          type: string
+        city:
+          type: ["string", "null"]
+        age:
+          type: ["integer", "null"]
+        mainGoal:
+          type: ["string", "null"]
+        subscriptionType:
+          type: ["string", "null"]
+        paymentStatus:
+          type: ["string", "null"]
+        currentTraz:
+          type: ["integer", "null"]
+        targetTraz:
+          type: ["integer", "null"]
+        studyHoursPerDay:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+
+    StudentInput:
+      type: object
+      required: [name, code, field, grade]
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        field:
+          type: string
+        grade:
+          type: string
+        city:
+          type: string
+        age:
+          type: integer
+        mainGoal:
+          type: string
+        subscriptionType:
+          type: string
+        currentTraz:
+          type: integer
+        targetTraz:
+          type: integer
+        studyHoursPerDay:
+          type: number
+
+    StudentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        grade:
+          type: string
+        city:
+          type: string
+        age:
+          type: integer
+        mainGoal:
+          type: string
+        subscriptionType:
+          type: string
+        currentTraz:
+          type: integer
+        targetTraz:
+          type: integer
+        studyHoursPerDay:
+          type: number
+
+    Exam:
+      type: object
+      required: [id, studentId, date, title, traz, rank, overallPercentage]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        date:
+          type: string
+        title:
+          type: string
+        traz:
+          type: integer
+        rank:
+          type: integer
+        overallPercentage:
+          type: number
+        lessonsJson:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ExamInput:
+      type: object
+      required: [date, title, traz, rank, overallPercentage]
+      properties:
+        date:
+          type: string
+        title:
+          type: string
+        traz:
+          type: integer
+        rank:
+          type: integer
+        overallPercentage:
+          type: number
+        lessonsJson:
+          type: string
+
+    TestTrap:
+      type: object
+      required: [id, studentId, questionTitle, subject, importance]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        questionTitle:
+          type: string
+        subject:
+          type: string
+        category:
+          type: ["string", "null"]
+        trapType:
+          type: ["string", "null"]
+        correctAnswer:
+          type: ["string", "null"]
+        userMistake:
+          type: ["string", "null"]
+        educationalNote:
+          type: ["string", "null"]
+        importance:
+          type: string
+        createdAt:
+          type: string
+
+    TrapInput:
+      type: object
+      required: [questionTitle, subject, importance]
+      properties:
+        questionTitle:
+          type: string
+        subject:
+          type: string
+        category:
+          type: string
+        trapType:
+          type: string
+        correctAnswer:
+          type: string
+        userMistake:
+          type: string
+        educationalNote:
+          type: string
+        importance:
+          type: string
+
+    DashboardSummary:
+      type: object
+      required: [totalExams, latestTraz, trazGrowth, totalTraps, studyStreak]
+      properties:
+        totalExams:
+          type: integer
+        latestTraz:
+          type: ["integer", "null"]
+        trazGrowth:
+          type: ["integer", "null"]
+        totalTraps:
+          type: integer
+        studyStreak:
+          type: integer
+        subscriptionType:
+          type: ["string", "null"]
+        targetTraz:
+          type: ["integer", "null"]
+
+    MotivationalQuote:
+      type: object
+      required: [quote]
+      properties:
+        quote:
+          type: string
+
+    ChatInput:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        studentField:
+          type: string
+
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+
+    ChatReply:
+      type: object
+      required: [reply]
+      properties:
+        reply:
+          type: string
+
+    ExamAnalysisInput:
+      type: object
+      required: [lessons, field]
+      properties:
+        lessons:
+          type: array
+          items:
+            $ref: "#/components/schemas/LessonDetail"
+        field:
+          type: string
+
+    LessonDetail:
+      type: object
+      required: [lessonName, percentage, correct, wrong, empty]
+      properties:
+        lessonName:
+          type: string
+        percentage:
+          type: number
+        correct:
+          type: integer
+        wrong:
+          type: integer
+        empty:
+          type: integer
+
+    ExamAnalysisResult:
+      type: object
+      required: [weaknesses, estimatedNextTraz]
+      properties:
+        weaknesses:
+          type: array
+          items:
+            type: object
+            properties:
+              topic:
+                type: string
+              subject:
+                type: string
+              percentage:
+                type: number
+              recommendation:
+                type: string
+              questionsCount:
+                type: integer
+              severity:
+                type: string
+        estimatedNextTraz:
+          type: integer
+        psychological:
+          type: object
+          properties:
+            pattern:
+              type: string
+            description:
+              type: string
+            stressLevel:
+              type: number
+            suggestion:
+              type: string
+        remedialPlan:
+          type: array
+          items:
+            type: object
+            properties:
+              day:
+                type: string
+              morningPlan:
+                type: string
+              afternoonPlan:
+                type: string
+              totalQuestions:
+                type: integer
+
+    GoalInsightInput:
+      type: object
+      required: [currentTraz, targetTraz]
+      properties:
+        currentTraz:
+          type: integer
+        targetTraz:
+          type: integer
+        currentPercentage:
+          type: number
+        targetGrowth:
+          type: number
+        latestQuizScore:
+          type: number
+        studentField:
+          type: string
+
+    GoalInsight:
+      type: object
+      required: [likelihood, text, recommendations]
+      properties:
+        likelihood:
+          type: integer
+        text:
+          type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+
+    AdminStatus:
+      type: object
+      required: [activeProvider, activeModel]
+      properties:
+        activeProvider:
+          type: ["string", "null"]
+        activeModel:
+          type: ["string", "null"]
+        providerStatus:
+          type: object
+
+    AdminSecrets:
+      type: object
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              provider:
+                type: string
+              label:
+                type: string
+              set:
+                type: boolean
+              masked:
+                type: string
+              model:
+                type: string
+        activeProvider:
+          type: object
+        diskProvider:
+          type: object
+
+    ProviderInput:
+      type: object
+      required: [provider, apiKey]
+      properties:
+        provider:
+          type: string
+        apiKey:
+          type: string
+        baseUrl:
+          type: string
+        model:
+          type: string
+
+    ProviderResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    AiTestInput:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          type: string
+        apiKey:
+          type: string
+        baseUrl:
+          type: string
+        model:
+          type: string
+        prompt:
+          type: string
+        useEnvKey:
+          type: boolean
+
+    AiTestResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        response:
+          type: string
+        latency:
+          type: integer
+        provider:
+          type: string
+        model:
+          type: string
+
+    ConfigStatus:
+      type: object
+      required: [hasGemini, activeProvider]
+      properties:
+        hasGemini:
+          type: boolean
+        hasGapGPT:
+          type: boolean
+        activeProvider:
+          type: ["string", "null"]
+        activeModel:
+          type: ["string", "null"]
+        configSource:
+          type: string
+        cloudflare:
+          type: object

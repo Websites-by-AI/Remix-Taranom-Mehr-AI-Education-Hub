@@ -1,0 +1,6 @@
+{
+  "id": "gemini",
+  "apiKey": "AIzaSyB5ZDKVcqutt9SvKlckwoo4MiqUlxzi-P4",
+  "baseUrl": "",
+  "model": "gemini-2.0-flash"
+}

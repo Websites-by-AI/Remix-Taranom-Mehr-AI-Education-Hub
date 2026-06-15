@@ -1,0 +1,65 @@
+import { TestTrap } from "../types";
+
+export const getTestTraps = (): TestTrap[] => {
+  const saved = localStorage.getItem("taranom_test_traps");
+  if (!saved) return [
+    {
+      id: "TRAP-1",
+      questionTitle: "محاسبه سرعت متوسط در حرکت با شتاب غیرثابت",
+      subject: "فیزیک تخصصی",
+      category: "اشتباه_محاسباتی",
+      trapType: "تله فرمول میانگین حسابی",
+      correctAnswer: "تقسیم جابجایی کل بر زمان کل (نه میانگین متجانس سرعت‌ها)",
+      userMistake: "سرعت اولیه و ثانویه را جمع کرده و تقسیم بر دو کردم در حالی که شتاب ثابت نبود.",
+      educationalNote: "فرمول (v1 + v2)/2 فقط و فقط زمانی صادق است که شتاب حرکت ثابت باشد.",
+      importance: "high",
+      createdAt: "۱۴۰۵/۰۳/۰۹"
+    },
+    {
+      id: "TRAP-2",
+      questionTitle: "ماهیت ساختاری غشای سلولی اندامک‌ها",
+      subject: "زیست‌شناسی",
+      category: "مفهومی",
+      trapType: "تله غشای دو لایه لپیدی",
+      correctAnswer: "ریبوزوم فاقد غشا است اما راکیزه (میتوکندری) غشای دو لایه دارد",
+      userMistake: "ریبوزوم را تک غشایی تلقی کردم.",
+      educationalNote: "ریبوزوم و سانتریول از ساختارهای بدون غشا در سلول‌های یوکاریوتی هستند.",
+      importance: "medium",
+      createdAt: "۱۴۰۵/۰۳/۰۹"
+    },
+    {
+      id: "TRAP-3",
+      questionTitle: "تفکیک مرحله‌های میوز I و میوز II",
+      subject: "زیست‌شناسی",
+      category: "مفهومی",
+      trapType: "تله شباهت ظاهری میتوز",
+      correctAnswer: "در میوز I جداسازی هموژن رخ می‌دهد؛ در میوز II جداسازی کروماتیدهای خواهری",
+      userMistake: "مرحله متافاز میوز I را با متافاز میتوز اشتباه گرفتم.",
+      educationalNote: "در متافاز I کروموزوم‌های هموژن دو به دو کنار هم قرار می‌گیرند، نه تک تک.",
+      importance: "high",
+      createdAt: "۱۴۰۵/۰۳/۱۰"
+    }
+  ];
+  try {
+    return JSON.parse(saved);
+  } catch {
+    return [];
+  }
+};
+
+export const saveTestTrap = (trap: Omit<TestTrap, "id" | "createdAt">) => {
+  const traps = getTestTraps();
+  const newTrap: TestTrap = {
+    ...trap,
+    id: `TRAP-${Date.now()}`,
+    createdAt: new Date().toLocaleDateString("fa-IR")
+  };
+  localStorage.setItem("taranom_test_traps", JSON.stringify([newTrap, ...traps]));
+  return newTrap;
+};
+
+export const deleteTestTrap = (id: string) => {
+  const traps = getTestTraps();
+  const filtered = traps.filter(t => t.id !== id);
+  localStorage.setItem("taranom_test_traps", JSON.stringify(filtered));
+};
